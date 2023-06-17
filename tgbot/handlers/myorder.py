@@ -7,23 +7,10 @@ from fake_useragent import UserAgent
 
 
 
-
-USER = None
-
-
-
 passsword = '1234'
 usernamee = 'owner'
 
-async def Hello_send(message: types.Message):
-    await  bot.send_message(message.from_user.id,f'Hello {message.from_user.first_name}')
-    if USER:
-        pass
-    else:
-        await message.answer('please login')
-
-
-async def login(message: types.Message):
+async  def login():
     headers = {
                 'User-Agent': UserAgent().random,
 
@@ -37,14 +24,38 @@ async def login(message: types.Message):
     response = requests.post('http://127.0.0.1:8000/auth/token/login/',headers=headers,data=data)
     orders = response.json()
 
-    await message.answer(str(orders['auth_token']))
-    return orders['auth_token']
 
 
-async def register(message: types.Message):
+
+    return str(orders['auth_token'])
+
+
+
+
+
+passsword = '1234'
+usernamee = 'owner'
+
+async def Hello_send(message: types.Message):
+    global auth_token
+    auth_token = await login()
+    ###
+    print(auth_token)
+    ###
+
+    await  bot.send_message(message.from_user.id,f'Hello {message.from_user.first_name}')
+
+    if auth_token:
+        pass
+    else:
+        await message.answer('please login')
+
+
+
+async def test(message: types.Message):
     headers = {
                 'User-Agent': UserAgent().random,
-                'Authorization': 'Token dfedc0eb1f3d64c37a6eec610c1cd5f53399478f'
+                'Authorization': f'Token {auth_token}'
             }
 
 
@@ -63,5 +74,5 @@ async def register(message: types.Message):
 ####
 def register_handlers_myorder(dp: Dispatcher):
     dp.register_message_handler(Hello_send,commands=['start'])
-    dp.register_message_handler(register,commands=['reg'])
+    dp.register_message_handler(test,commands=['order'])
     dp.register_message_handler(login,commands=['login'])
