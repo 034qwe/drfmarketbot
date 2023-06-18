@@ -8,7 +8,7 @@ async def on_startup(_):
     print('bot start')
 
 
-storage = MemoryStorage()
+
 
 
 myorder.register_handlers_myorder(dp)
