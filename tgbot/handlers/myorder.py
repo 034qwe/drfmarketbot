@@ -19,10 +19,10 @@ async def Hello_send(message: types.Message):
     except:
         await message.answer(f'please login \n command: /reg')
 
+
 class RegistrationStates(StatesGroup):
     waiting_username = State()
     waiting_password = State()
-
 
 
 async def start_handler(message: types.Message):
@@ -32,7 +32,6 @@ async def start_handler(message: types.Message):
     except:
         await RegistrationStates.waiting_username.set()
         await message.reply("enter your username:")
-
 
 
 async def username_handler(message: types.Message, state: FSMContext):
@@ -48,54 +47,34 @@ async def password_handler(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['password'] = message.text
 
-    # Получение данных из состояния
     async with state.proxy() as data:
         username = data['username']
         password = data['password']
 
-        # Выполнение действий с полученными данными
-        # Например, вызов вашей функции login()
+
         try:
             auth_token = await login(username=username,password=password)
             await message.answer('you registered')
         except:
             await message.answer('incorrect password or username')
 
-        # Отправка ответа пользователю
 
-
-    # Сброс состояния
     await state.finish()
 
-
-
-
-
-passsword = '1234'
-usernamee = 'owner'
 
 async  def login(username,password):
     headers = {
                 'User-Agent': UserAgent().random,
-
-
             }
     data = {
         'username': username,
         'password': password
     }
 
-    
     response = requests.post('http://127.0.0.1:8000/auth/token/login/',headers=headers,data=data)
     orders = response.json()
 
-
-
-
     return str(orders['auth_token'])
-
-
-
 
 
 async def test(message: types.Message):
@@ -103,10 +82,6 @@ async def test(message: types.Message):
                 'User-Agent': UserAgent().random,
                 'Authorization': f'Token {auth_token}'
             }
-
-
-
-
 
     response = requests.get('http://127.0.0.1:8000/myorder/',headers=headers)
     orders = response.json()
