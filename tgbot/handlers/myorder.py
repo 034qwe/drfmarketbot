@@ -1,17 +1,22 @@
 import requests
 from re import search
 from aiogram import Dispatcher,types
-from createbot import dp,bot
+from bot import dp,bot
 from fake_useragent import UserAgent
+import asyncio
 
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
+async def handle_message(message: types.Message, state: FSMContext):
+
+    await state.update_data(message=message)
+
 
 async def Hello_send(message: types.Message):
-    
-
+    global USER_ID
+    USER_ID = message.from_user.id
     await  bot.send_message(message.from_user.id,f'Hello {message.from_user.first_name}')
 
     try:
@@ -90,6 +95,25 @@ async def test(message: types.Message):
 
 
 
+async def my_handler():
+
+    headers = {
+        'User-Agent': UserAgent().random,
+        'Authorization': f'Token {auth_token}'
+    }
+
+    response = requests.get('http://127.0.0.1:8000/myorder/', headers=headers)
+    orders = response.json()
+    for i in orders:
+        await bot.send_message(USER_ID,'HELLO')
+
+    await asyncio.sleep(1)
+
+
+async def fetch_orders():
+    while True:
+        await my_handler()
+        await asyncio.sleep(1)
 
 
 ####
@@ -100,5 +124,6 @@ def register_handlers_myorder(dp: Dispatcher):
     dp.register_message_handler(start_handler,commands=['reg'])
     dp.register_message_handler(username_handler,state=RegistrationStates.waiting_username)
     dp.register_message_handler(password_handler,state=RegistrationStates.waiting_password)
+    dp.message_handler(handle_message)
 
 
