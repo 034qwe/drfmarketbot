@@ -9,14 +9,15 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-async def handle_message(message: types.Message, state: FSMContext):
+# async def handle_message(message: types.Message, state: FSMContext):
 
-    await state.update_data(message=message)
+#     await state.update_data(message=message)
 
 
 async def Hello_send(message: types.Message):
     global USER_ID
     USER_ID = message.from_user.id
+ 
     await  bot.send_message(message.from_user.id,f'Hello {message.from_user.first_name}')
 
     try:
@@ -97,18 +98,26 @@ async def test(message: types.Message):
 
 async def my_handler():
 
-    headers = {
-        'User-Agent': UserAgent().random,
-        'Authorization': f'Token {auth_token}'
-    }
+    try:
+        headers = {
+            'User-Agent': UserAgent().random,
+            'Authorization': f'Token {auth_token}'
+        }
 
-    response = requests.get('http://127.0.0.1:8000/myorder/', headers=headers)
-    orders = response.json()
-    for i in orders:
-        await bot.send_message(USER_ID,'HELLO')
+        response = requests.get('http://127.0.0.1:8000/myorder/', headers=headers)
+        orders = response.json()
+    except:
+        pass
 
-    await asyncio.sleep(1)
 
+
+    try: 
+        for i in orders:
+            await bot.send_message(USER_ID,i['product'][ 'title'])
+        await asyncio.sleep(1)
+
+    except:
+        pass
 
 async def fetch_orders():
     while True:
@@ -124,6 +133,6 @@ def register_handlers_myorder(dp: Dispatcher):
     dp.register_message_handler(start_handler,commands=['reg'])
     dp.register_message_handler(username_handler,state=RegistrationStates.waiting_username)
     dp.register_message_handler(password_handler,state=RegistrationStates.waiting_password)
-    dp.message_handler(handle_message)
+    # dp.message_handler(handle_message)
 
 
