@@ -112,8 +112,16 @@ async def my_handler():
 
 
     try: 
+        answ='your item has been delivered\n'
         for i in orders:
-            await bot.send_message(USER_ID,i['product'][ 'title'])
+            if i['is_bought']:
+
+                
+                answ+=str(i['product'][ 'title'])+', '
+            # await bot.send_message(USER_ID,text=i['product'][ 'title'])
+        if answ !='your item has been delivered\n':
+            await bot.send_message(USER_ID,text=answ)
+
         await asyncio.sleep(1)
 
     except:
