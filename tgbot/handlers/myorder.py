@@ -1,7 +1,7 @@
 import requests
 from re import search
 from aiogram import Dispatcher,types
-from bot import dp,bot
+from bot import dp,bot,TOKEN
 from fake_useragent import UserAgent
 import asyncio
 
@@ -9,14 +9,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-# async def handle_message(message: types.Message, state: FSMContext):
-
-#     await state.update_data(message=message)
-
 
 async def Hello_send(message: types.Message):
-    global USER_ID
-    USER_ID = message.from_user.id
+    global user_id
+    user_id = message.from_user.id
  
     await  bot.send_message(message.from_user.id,f'Hello {message.from_user.first_name}')
 
@@ -84,19 +80,14 @@ async  def login(username,password):
 
 
 async def test(message: types.Message):
-    headers = {
-                'User-Agent': UserAgent().random,
-                'Authorization': f'Token {auth_token}'
-            }
-
-    response = requests.get('http://127.0.0.1:8000/myorder/',headers=headers)
-    orders = response.json()
-
-    [ await message.answer(i['product']['images'][0]['image']["full_size"]) for i in orders]
 
 
+    chat_id = "1708455044"
+    message = "hello from your telegram bot"
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}"
+    print(requests.get(url).json())
 
-async def my_handler():
+async def product_inspection():
 
     try:
         headers = {
@@ -118,9 +109,9 @@ async def my_handler():
 
                 
                 answ+=str(i['product'][ 'title'])+', '
-            # await bot.send_message(USER_ID,text=i['product'][ 'title'])
+
         if answ !='your item has been delivered\n':
-            await bot.send_message(USER_ID,text=answ)
+            await bot.send_message(user_id,text=answ)
 
         await asyncio.sleep(1)
 
@@ -129,7 +120,7 @@ async def my_handler():
 
 async def fetch_orders():
     while True:
-        await my_handler()
+        await product_inspection()
         await asyncio.sleep(1)
 
 
@@ -137,10 +128,7 @@ async def fetch_orders():
 def register_handlers_myorder(dp: Dispatcher):
     dp.register_message_handler(Hello_send,commands=['start'])
     dp.register_message_handler(test,commands=['order'])
-    dp.register_message_handler(login,commands=['login'])
+    # dp.register_message_handler(login,commands=['login'])
     dp.register_message_handler(start_handler,commands=['reg'])
     dp.register_message_handler(username_handler,state=RegistrationStates.waiting_username)
     dp.register_message_handler(password_handler,state=RegistrationStates.waiting_password)
-    # dp.message_handler(handle_message)
-
-
